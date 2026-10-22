@@ -1,52 +1,10 @@
-# 🌿 Stratégie de Branches Gitflow - Backend
+# Gitflow du projet
 
-Ce dépôt respecte la méthodologie standard **Gitflow** pour assurer un cycle de livraison fiable, traçable et sécurisé.
+Ce projet utilise une organisation en branches Gitflow :
 
----
+- `main` : Branche de production, correspond a la version stable deployee sur Coolify.
+- `develop` : Branche de developpement principal et d'integration.
+- `feature/*` : Branches temporaires pour developper de nouvelles fonctionnalites avant fusion sur `develop`.
+- `hotfix/*` : Branches pour corriger un bug critique directement depuis `main`.
 
-## 📌 Architecture des Branches
-
-```text
-  main ──────●────────────────────────● (v1.0.0 / Production)
-             ▲                        ▲
-             │                        │ Merge release
-  release ───┼──────────●─────────────┘
-             │          ▲
-             │          │ Cut release
-  develop ───●──●───────●──●──────────► (Intégration continue / Staging)
-                ▲       ▲  ▲
-     feature ───┘       │  │
-                        └──┘
-```
-
-### 1. Branches Principales (Long-lived)
-
-| Branche | Rôle | Environnement de déploiement | Protection |
-|---|---|---|---|
-| **`main`** | Code stable de production | Coolify Production Backend | Protégée (PR requise, checks CI validés) |
-| **`develop`** | Intégration continue | Coolify Staging Backend | Protégée (Merge via PR uniquement) |
-
-### 2. Branches Temporaires (Short-lived)
-
-- **`feature/<nom-fonctionnalite>`** :
-  - Créée depuis : `develop`
-  - Mergée dans : `develop`
-  - Exemple : `feature/pet-energy-statistic`, `feature/leaderboard-api`
-- **`release/vX.Y.Z`** :
-  - Créée depuis : `develop`
-  - Mergée dans : `main` ET `develop`
-  - Taggée sur `main` avec le tag de version semver `vX.Y.Z`.
-- **`hotfix/<nom-correctif>`** :
-  - Créée depuis : `main`
-  - Mergée dans : `main` ET `develop`
-  - Permet de corriger un incident critique en production.
-
----
-
-## 🛡️ Règles de Validation CI/CD
-
-Avant tout merge sur `develop` ou `main`, le pipeline GitHub Actions valide obligatoirement :
-1. ✅ Exécution des tests unitaires Maven (`mvn test`).
-2. ✅ Hadolint sur le `Dockerfile` multi-stage.
-3. ✅ Audit de vulnérabilités Trivy.
-4. ✅ Publication sur GHCR (`ghcr.io/skywishky/cappoensixdellelys-back`).
+Les modifications sont testees et validees automatiquement par GitHub Actions avant d'etre deployees.
