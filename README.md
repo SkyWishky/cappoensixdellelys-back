@@ -50,7 +50,7 @@ Workflow automatisé défini dans `.github/workflows/ci-cd.yml` :
    - `ghcr.io/skywishky/cappoensixdellelys-back:latest` (branche `main`)
    - `ghcr.io/skywishky/cappoensixdellelys-back:dev-latest` (branche `develop`)
    - `ghcr.io/skywishky/cappoensixdellelys-back:vX.Y.Z` (tags de version)
-5. **🔄 Continuous Deployment** : Déclenchement automatique par webhook Coolify pour rafraîchissement sans coupure.
+5. **🔄 Continuous Deployment** : Déclenchement du webhook Coolify uniquement après un push sur `main`.
 
 ---
 
@@ -73,7 +73,7 @@ Consultez le document dédié : **[GITFLOW.md](GITFLOW.md)**.
 | `DB_PORT` | Port du serveur PostgreSQL | `5432` |
 | `DB_NAME` | Nom de la base de données | `tamagochi` |
 | `DB_USER` | Utilisateur de connexion à la base | `tamagochi` |
-| `DB_PASSWORD` | Mot de passe de la base | `tamagochi_secret` |
+| `DB_PASSWORD` | Mot de passe de la base | `replace-with-a-unique-local-password` |
 | `PET_DECAY_INTERVAL` | Intervalle de dégradation en millisecondes | `10000` |
 
 ---
@@ -85,6 +85,7 @@ Consultez le document dédié : **[GITFLOW.md](GITFLOW.md)**.
 docker build -t cappoensixdellelys-back .
 
 # Exécution avec liaison vers une base PostgreSQL existante
+# Exportez un mot de passe unique dans DB_PASSWORD avant de lancer cette commande.
 docker run -d \
   --name tamagotchi-back \
   -p 8080:8080 \
@@ -92,7 +93,7 @@ docker run -d \
   -e DB_PORT=5432 \
   -e DB_NAME=tamagochi \
   -e DB_USER=tamagochi \
-  -e DB_PASSWORD=tamagochi_secret \
+  -e DB_PASSWORD="${DB_PASSWORD:?Export DB_PASSWORD first}" \
   cappoensixdellelys-back
 ```
 
