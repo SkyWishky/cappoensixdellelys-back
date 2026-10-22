@@ -13,7 +13,7 @@ Ce dépôt respecte la méthodologie standard **Gitflow** pour assurer un cycle 
   release ───┼──────────●─────────────┘
              │          ▲
              │          │ Cut release
-  develop ───●──●───────●──●──────────► (Intégration continue / Staging)
+  develop ───●──●───────●──●──────────► (CI ; publication dev-latest, sans déploiement)
                 ▲       ▲  ▲
      feature ───┘       │  │
                         └──┘
@@ -23,8 +23,8 @@ Ce dépôt respecte la méthodologie standard **Gitflow** pour assurer un cycle 
 
 | Branche | Rôle | Environnement de déploiement | Protection |
 |---|---|---|---|
-| **`main`** | Code stable de production | Coolify Production Backend | Protégée (PR requise, checks CI validés) |
-| **`develop`** | Intégration continue | Coolify Staging Backend | Protégée (Merge via PR uniquement) |
+| **`main`** | Code stable de production | Coolify Production Backend | Protection à configurer par un administrateur |
+| **`develop`** | Intégration continue | CI et publication `dev-latest` ; aucun déploiement automatique | Protection à configurer par un administrateur |
 
 ### 2. Branches Temporaires (Short-lived)
 
@@ -50,3 +50,5 @@ Avant tout merge sur `develop` ou `main`, le pipeline GitHub Actions valide obli
 2. ✅ Hadolint sur le `Dockerfile` multi-stage.
 3. ✅ Audit de vulnérabilités Trivy.
 4. ✅ Publication sur GHCR (`ghcr.io/skywishky/cappoensixdellelys-back`).
+
+Le workflow déclenche Coolify uniquement après un push sur `main`. Les protections GitHub des branches n’étaient pas configurées/vérifiables lors de cet audit ; leur activation nécessite un compte administrateur.
