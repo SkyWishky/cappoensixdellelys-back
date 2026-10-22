@@ -1,7 +1,7 @@
 # ==========================================
 # Stage 1: Build Spring Boot Application
 # ==========================================
-FROM maven:3.9.6-eclipse-temurin-21-alpine AS build
+FROM maven:3.9.9-eclipse-temurin-21-alpine AS build
 
 WORKDIR /app
 
@@ -32,8 +32,6 @@ ENV SERVER_PORT=8080 \
     DB_HOST=database \
     DB_PORT=5432 \
     DB_NAME=tamagochi \
-    DB_USER=tamagochi \
-    DB_PASSWORD=tamagochi \
     PET_DECAY_INTERVAL=10s
 
 EXPOSE 8080

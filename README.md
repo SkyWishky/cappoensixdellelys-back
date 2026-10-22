@@ -26,47 +26,56 @@ URL en production : https://tpfinal.tp-devops-6.online
 
 ## Lancer en local avec Docker Compose
 
-Pour lancer l'application en local (build le backend et telecharge le frontend et la base de donnees depuis le registre) :
+Copiez `.env.example` vers `.env`, remplacez `POSTGRES_PASSWORD` par un secret local, puis démarrez la stack :
 
 ```bash
+cp .env.example .env
 docker compose up -d
 ```
 
-L'API sera accessible sur http://localhost:8080.
+L'application est disponible sur [http://localhost:4200](http://localhost:4200); l'API reste interne au réseau Compose et est accessible via le proxy frontend. Pour arrêter les conteneurs :
 
-Pour arreter les conteneurs :
 ```bash
 docker compose down
 ```
 
-## Lancer le conteneur seul
+## Configuration
+
+| Variable | Description | Exemple |
+|---|---|---|
+| `SERVER_PORT` | Port d'écoute de l'API | `8080` |
+| `DB_HOST` | Hôte PostgreSQL | `database` |
+| `DB_PORT` | Port PostgreSQL | `5432` |
+| `DB_NAME` | Nom de la base | `tamagochi` |
+| `DB_USER` | Utilisateur PostgreSQL | `tamagochi` |
+| `DB_PASSWORD` | Secret PostgreSQL requis | Secret local unique |
+| `PET_DECAY_INTERVAL` | Intervalle de dégradation en millisecondes | `10000` |
+
+## Pipeline CI/CD
+
+Le workflow `.github/workflows/ci-cd.yml` exécute les tests Maven, Hadolint et Trivy, puis publie l'image GHCR. `main` publie `latest` et déclenche le webhook Coolify; `develop` publie `dev-latest` sans déployer la production.
+
+## Gitflow
+
+Consultez [GITFLOW.md](GITFLOW.md). La protection des branches GitHub doit être configurée par un administrateur.
+
+## Exécution manuelle du conteneur
+
+Pour connecter l'API à une base PostgreSQL disponible sur l'hôte, exportez d'abord `DB_PASSWORD`, puis lancez :
 
 ```bash
-docker build -t backend-tamagotchi .
-docker run -d -p 8080:8080 -e DB_HOST=localhost -e DB_USER=tamagochi -e DB_PASSWORD=tamagochi backend-tamagotchi
+docker build -t cappoensixdellelys-back .
+docker run -d --name tamagotchi-back \
+  -p 127.0.0.1:8080:8080 \
+  --add-host=host.docker.internal:host-gateway \
+  -e DB_HOST=host.docker.internal -e DB_PORT=5432 \
+  -e DB_NAME=tamagochi -e DB_USER=tamagochi \
+  -e DB_PASSWORD="${DB_PASSWORD:?Export DB_PASSWORD first}" \
+  cappoensixdellelys-back
 ```
 
-## Variables d'environnement
-
-- `SERVER_PORT` : Port de l'application (8080).
-- `DB_HOST` : Adresse de la base de donnees (database ou localhost).
-- `DB_PORT` : Port de la base de donnees (5432).
-- `DB_NAME` : Nom de la base (tamagochi).
-- `DB_USER` : Utilisateur de la base (tamagochi).
-- `DB_PASSWORD` : Mot de passe de la base (tamagochi_secret).
-- `PET_DECAY_INTERVAL` : Intervalle de mise a jour de l'etat des animaux (10000 ms).
-
-## Pipeline CI/CD (GitHub Actions)
-
-A chaque push sur `main` et `develop`, le pipeline execute :
-1. Tests unitaires et compilation Maven avec Java 21.
-2. Verification du Dockerfile avec Hadolint.
-3. Scan de securite des dependances avec Trivy.
-4. Construction et publication de l'image Docker sur GitHub Container Registry (ghcr.io).
-5. Declenchement du webhook de deploiement automatique sur Coolify.
-
-## Liens des depots du projet
+## Dépôts du projet
 
 - Frontend : https://github.com/SkyWishky/cappoensixdellelys-front
 - Backend : https://github.com/SkyWishky/cappoensixdellelys-back
-- Database et Infra : https://github.com/SkyWishky/cappoensixdellelys-database
+- Base de données et infrastructure : https://github.com/SkyWishky/cappoensixdellelys-database
